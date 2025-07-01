@@ -1,0 +1,4 @@
+{
+  "extends": "@fooddelivery/tsconfig/nextjs.json",
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"]
+}

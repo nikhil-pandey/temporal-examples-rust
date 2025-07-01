@@ -1,0 +1,27 @@
+[package]
+name = "schedule"
+version = "0.1.0"
+edition = "2021"
+default-run = "main"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+anyhow = "1.0.98"
+dotenv = "0.15.0"
+env_logger = "0.11.8"
+log = "0.4.27"
+nanoid = "0.4.0"
+prost-wkt-types = "0.6.1"
+rand = "0.9.1"
+reqwest = { version = "0.12.20", features = ["json"] }
+serde = { version = "1.0.219", features = ["derive"] }
+serde_json = "1.0.140"
+temporal-client = { git="https://github.com/temporalio/sdk-core" }
+temporal-sdk = { git="https://github.com/temporalio/sdk-core" }
+temporal-sdk-core = {  git="https://github.com/temporalio/sdk-core" }
+temporal-sdk-core-api = {  git="https://github.com/temporalio/sdk-core" }
+temporal-sdk-core-protos = {  git="https://github.com/temporalio/sdk-core" }
+temporal-helpers = { path = "../temporal-helpers" }
+tokio = { version = "1.45.1", features = ["full"] }
+uuid = { version = "1.17.0", features = ["v4"] }

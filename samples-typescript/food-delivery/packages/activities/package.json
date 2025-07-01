@@ -1,0 +1,21 @@
+{
+  "name": "@fooddelivery/activities",
+  "version": "0.0.1",
+  "license": "MIT",
+  "main": "./lib/index.js",
+  "types": "./index.ts",
+  "scripts": {
+    "build": "tsc --build",
+    "build.watch": "tsc --build --watch",
+    "lint": "TIMING=1 eslint \"**/*.ts*\""
+  },
+  "dependencies": {
+    "@fooddelivery/common": "*",
+    "@temporalio/activity": "^1.11.8"
+  },
+  "devDependencies": {
+    "@fooddelivery/tsconfig": "*",
+    "eslint": "^8.57.1",
+    "typescript": "^5.6.3"
+  }
+}
