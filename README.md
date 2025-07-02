@@ -1,5 +1,7 @@
 # Temporal Rust Examples Workspace
 
+⚠️ **Warning: This repository is fully AI-generated.** ⚠️
+
 ## Project purpose
 
 This repository is a modern, curated set of examples for using Temporal with Rust.
