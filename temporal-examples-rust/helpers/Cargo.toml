@@ -1,0 +1,21 @@
+[package]
+name = "helpers"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+anyhow = { workspace = true }
+temporal-client = { workspace = true }
+temporal-sdk = { workspace = true }
+temporal-sdk-core = { workspace = true }
+temporal-sdk-core-api = { workspace = true }
+temporal-sdk-core-protos = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+log = { workspace = true }
+
+# `helpers` re-exports common utility helpers that multiple example crates
+# depend on. It purposely has *no* crate-level default features enabled so
+# that each example can decide what it needs. The new `parse_activity_result`
+# helper requires `serde_json`, which we already depend on transitively via
+# the workspace, so no additional dependency is required here.

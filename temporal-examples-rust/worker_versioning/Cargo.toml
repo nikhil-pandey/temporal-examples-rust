@@ -1,0 +1,22 @@
+[package]
+name = "worker_versioning"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+anyhow = { workspace = true }
+env_logger = { workspace = true }
+log = { workspace = true }
+tokio = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+uuid = { workspace = true }
+
+# Temporal crates
+temporal-client = { workspace = true }
+temporal-sdk = { workspace = true }
+temporal-sdk-core = { workspace = true }
+temporal-sdk-core-api = { workspace = true }
+temporal-sdk-core-protos = { workspace = true }
+
+helpers = { path = "../helpers" }

@@ -1,0 +1,5 @@
+[toolchain]
+channel = "nightly"
+
+# Optional components to ensure formatting / linting work.
+components = ["rustfmt", "clippy"]

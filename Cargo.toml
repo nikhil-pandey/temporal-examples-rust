@@ -1,0 +1,71 @@
+[workspace]
+
+members = [
+    "temporal-examples-rust/child_workflows",
+    "temporal-examples-rust/continue_as_new",
+    "temporal-examples-rust/helpers",
+    "temporal-examples-rust/hello_world",
+    "temporal-examples-rust/http_request",
+    "temporal-examples-rust/timer",
+    "temporal-examples-rust/async_activity_completion",
+    "temporal-examples-rust/activities_cancellation_heartbeating",
+    # Signals example demonstrating workflow signalling
+    "temporal-examples-rust/signals_unblock",
+
+    # Signals + queries example (TypeScript parity)
+    "temporal-examples-rust/signals_queries",
+
+    # Cron workflows example
+    "temporal-examples-rust/cron_workflows",
+    # Mutex example
+    "temporal-examples-rust/mutex",
+    # Added saga example
+    "temporal-examples-rust/saga",
+    "temporal-examples-rust/search_attributes",
+    # Worker versioning example
+    "temporal-examples-rust/worker_versioning",
+    # New: Dependency injection activities example
+    "temporal-examples-rust/activities_dependency_injection",
+    "temporal-examples-rust/message_passing",
+
+    # New: Worker-specific task queue routing example
+    "temporal-examples-rust/worker_specific_task_queues",
+
+    # New: Sleep-for-days example (mirrors TS)
+    "temporal-examples-rust/sleep_for_days",
+
+    # Custom logger example (TypeScript parity)
+    "temporal-examples-rust/custom_logger",
+    "temporal-examples-rust/grpc_calls",
+    "temporal-examples-rust/expense",
+
+]
+
+resolver = "3"
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+
+[workspace.dependencies]
+anyhow = "1.0.98"
+env_logger = "0.11.8"
+log = "0.4.27"
+tokio = { version = "1.45.1", features = ["full"] }
+serde = { version = "1.0.219", features = ["derive"] }
+serde_json = "1.0.140"
+uuid = { version = "1.7.0", features = ["v4"] }
+reqwest = { version = "0.12.22", features = ["json"] }
+
+# Add common proto helper for RetryPolicy durations
+prost-wkt-types = "0.6.1"
+
+# Random number generation
+rand = "0.9.1"
+
+# Temporal crates
+temporal-client = { git = "https://github.com/temporalio/sdk-core" }
+temporal-sdk = { git = "https://github.com/temporalio/sdk-core" }
+temporal-sdk-core = { git = "https://github.com/temporalio/sdk-core" }
+temporal-sdk-core-api = { git = "https://github.com/temporalio/sdk-core" }
+temporal-sdk-core-protos = { git = "https://github.com/temporalio/sdk-core" }
