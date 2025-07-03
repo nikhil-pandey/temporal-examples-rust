@@ -51,13 +51,12 @@ pub async fn lock_workflow(ctx: WfContext) -> WorkflowResult<()> {
                     signal = release_chan.next() => {
                         if let Some(sig) = signal {
                             // Match signal by decoding first payload as the workflow id
-                            if let Some(payload) = sig.input.first() {
-                                if let Ok(releaser) = String::from_json_payload(payload) {
-                                    if releaser == holder {
-                                        info!(target: "mutex", "Received lock release from holder {releaser}");
-                                        break;
-                                    }
-                                }
+                            if let Some(payload) = sig.input.first()
+                                && let Ok(releaser) = String::from_json_payload(payload)
+                                && releaser == holder
+                            {
+                                info!(target: "mutex", "Received lock release from holder {releaser}");
+                                break;
                             }
                         }
                     }
@@ -75,12 +74,13 @@ pub async fn lock_workflow(ctx: WfContext) -> WorkflowResult<()> {
             maybe_req = req_chan.next() => {
                 if let Some(sig) = maybe_req {
                     // Signal input: workflow id will be in first payload of input
-                    if let Some(payload) = sig.input.first() {
-                        if let Ok(requestor) = String::from_json_payload(payload) {
-                            info!(target: "mutex", "Received lock request from {requestor}");
-                            if !queue.contains(&requestor) {
-                                queue.push_back(requestor);
-                            }
+                    // Attempt to decode the requestor workflow id from the first payload.
+                    if let Some(payload) = sig.input.first()
+                        && let Ok(requestor) = String::from_json_payload(payload)
+                    {
+                        info!(target: "mutex", "Received lock request from {requestor}");
+                        if !queue.contains(&requestor) {
+                            queue.push_back(requestor);
                         }
                     }
                 }
@@ -95,22 +95,18 @@ pub async fn lock_workflow(ctx: WfContext) -> WorkflowResult<()> {
 
 /// Test workflow: request the lock, wait for acquisition, do work, then release.
 pub async fn test_lock_workflow(ctx: WfContext) -> WorkflowResult<()> {
-    // Workflow expects as argument: lock_id (string)
+    // 1) Parse the **lock id** from the single workflow argument (defaults to
+    //    "mutex-lock" when not supplied by the client).
     let lock_id: String = ctx
         .get_args()
         .first()
         .map(String::from_json_payload)
         .transpose()? // Option<Result<T>> -> Result<Option<T>>
-        .unwrap_or("mutex-lock".to_owned());
-    // Get our own workflow id
-    // Use the lock test workflow's own id as its identity
-    // (should match what client used as workflow id for itself)
-    let my_id = ctx
-        .get_args()
-        .first()
-        .map(String::from_json_payload)
-        .transpose()? // Option<Result<T>> -> Result<Option<T>>
-        .unwrap_or_else(|| "test-locker-unknown".to_string());
+        .unwrap_or_else(|| "mutex-lock".to_owned());
+
+    // 2) Identify *this* workflow execution by retrieving our unique
+    //    Workflow Id from the info struct.
+    let my_id = ctx.workflow_initial_info().workflow_id.clone();
     // Prepare the payload that identifies us (the requesting workflow)
     let payloads: Vec<Payload> = vec![my_id.as_json_payload()?];
     info!(target: "mutex", "{my_id}: Requesting lock {lock_id}");
@@ -128,13 +124,12 @@ pub async fn test_lock_workflow(ctx: WfContext) -> WorkflowResult<()> {
         tokio::select! {
             Some(sig) = acquired_chan.next() => {
                 // Only acquire if signal intended for us
-                if let Some(payload) = sig.input.first() {
-                    if let Ok(target) = String::from_json_payload(payload) {
-                        if target == my_id {
-                            info!(target: "mutex", "{my_id}: Acquired lock {lock_id}");
-                            break;
-                        }
-                    }
+                if let Some(payload) = sig.input.first()
+                    && let Ok(target) = String::from_json_payload(payload)
+                    && target == my_id
+                {
+                    info!(target: "mutex", "{my_id}: Acquired lock {lock_id}");
+                    break;
                 }
             }
             _ = ctx.cancelled() => {

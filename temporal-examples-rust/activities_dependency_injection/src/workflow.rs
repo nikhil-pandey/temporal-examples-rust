@@ -2,7 +2,7 @@
 use log::info;
 use temporal_sdk::{ActivityOptions, WfContext, WfExitValue, WorkflowResult};
 use temporal_sdk_core_protos::coresdk::{
-    workflow_commands::ActivityCancellationType, AsJsonPayloadExt, FromJsonPayloadExt,
+    AsJsonPayloadExt, FromJsonPayloadExt, workflow_commands::ActivityCancellationType,
 };
 
 /// Workflow that calls `greet_english` and `greet_spanish` activities.

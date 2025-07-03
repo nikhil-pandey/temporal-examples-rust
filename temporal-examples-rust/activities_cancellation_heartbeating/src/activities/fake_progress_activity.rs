@@ -35,9 +35,11 @@ pub async fn fake_progress_activity(
         println!("Progress: {count}");
 
         // Record heartbeat with latest progress.
-        ctx.record_heartbeat(vec![count
-            .as_json_payload()
-            .expect("Could not serialize heartbeat")]);
+        ctx.record_heartbeat(vec![
+            count
+                .as_json_payload()
+                .expect("Could not serialize heartbeat"),
+        ]);
 
         // Respect cancellation – break out early if workflow requested it.
         if ctx.is_cancelled() {

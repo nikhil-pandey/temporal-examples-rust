@@ -7,7 +7,7 @@ use serde_json::json;
 use std::time::Duration;
 use temporal_sdk::{ActivityOptions, WfContext, WfExitValue, WorkflowResult};
 use temporal_sdk_core_protos::coresdk::{
-    workflow_commands::ActivityCancellationType, AsJsonPayloadExt,
+    AsJsonPayloadExt, workflow_commands::ActivityCancellationType,
 };
 
 // Signal names
@@ -59,22 +59,24 @@ pub async fn expense_workflow(ctx: WfContext) -> WorkflowResult<String> {
         }
     }
 
-    // Call http_post (could fail/ignored for log)
+    // Call http_post (fire-and-forget). We pass the *structured* `Expense`
+    // value directly – **not** a JSON string – so the activity receives the
+    // expected object.
     let _ = ctx
         .activity(ActivityOptions {
             activity_type: "http_post".into(),
-            input: serde_json::to_string(&expense)?.as_json_payload()?,
+            input: expense.as_json_payload()?,
             start_to_close_timeout: Some(Duration::from_secs(10)),
             cancellation_type: ActivityCancellationType::TryCancel,
             ..Default::default()
         })
         .await;
 
-    // Call complete_expense to change status finalized
+    // Call complete_expense to finalize status. Again pass structured value.
     let final_expense: Expense = parse_activity_result(
         &ctx.activity(ActivityOptions {
             activity_type: "complete_expense".into(),
-            input: serde_json::to_string(&expense)?.as_json_payload()?,
+            input: expense.as_json_payload()?,
             start_to_close_timeout: Some(Duration::from_secs(10)),
             cancellation_type: ActivityCancellationType::TryCancel,
             ..Default::default()

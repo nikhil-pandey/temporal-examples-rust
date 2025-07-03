@@ -48,10 +48,12 @@ async fn main() -> anyhow::Result<()> {
         start_res.run_id
     );
 
-    // Immediately query open workflows with CustomerId attribute.
-    let _query = format!("CustomerId=\"{customer_id}\"");
+    // Immediately query open workflows with CustomStringField attribute.
+    let _query = format!("CustomStringField=\"{customer_id}\"");
     // Note: Listing by search attribute is not yet available in this SDK version; please see README for CLI example.
-    println!("(Rust SDK: 'list_workflows' by search attribute is not yet implemented; use temporal CLI or web UI!)");
+    println!(
+        "(Rust SDK: 'list_workflows' by search attribute is not yet implemented; use temporal CLI or web UI!)"
+    );
 
     // Wait for workflow to complete
     let handle = client.get_untyped_workflow_handle(workflow_id.clone(), start_res.run_id.clone());

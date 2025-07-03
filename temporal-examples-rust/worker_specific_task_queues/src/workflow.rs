@@ -3,7 +3,7 @@ use helpers::parse_activity_result;
 use log::info;
 use temporal_sdk::{ActivityOptions, WfContext, WfExitValue, WorkflowResult};
 use temporal_sdk_core_protos::coresdk::{
-    workflow_commands::ActivityCancellationType, AsJsonPayloadExt,
+    AsJsonPayloadExt, workflow_commands::ActivityCancellationType,
 };
 
 /// Workflow: call greet_from_queue activity on both task queues, return Vec<String>.

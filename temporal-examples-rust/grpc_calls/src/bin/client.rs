@@ -1,64 +1,44 @@
-use env_logger::Env;
-use helpers::get_client;
-use log::info;
-use serde_json::json;
+//! Example: raw gRPC call to Temporal Frontend – ListNamespaces.
 
-use temporal_client::WorkflowOptions;
-use temporal_client::{WfClientExt, WorkflowClientTrait};
-use temporal_sdk_core_protos::coresdk::{AsJsonPayloadExt, FromJsonPayloadExt};
-use temporal_sdk_core_protos::temporal::api::common::v1::Payload;
-use uuid::Uuid;
+use env_logger::Env;
+use log::info;
+
+use tonic::transport::Channel;
+
+// The generated gRPC client is re-exported from sdk-core protos.
+use temporal_sdk_core_protos::temporal::api::workflowservice::v1::ListNamespacesRequest;
+use temporal_sdk_core_protos::temporal::api::workflowservice::v1::workflow_service_client::WorkflowServiceClient;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
+    // Initialise simple stdout logger.
     env_logger::Builder::from_env(Env::default().default_filter_or("info")).init();
 
-    // The name to greet can be provided as CLI arg; default to "World".
-    let name = std::env::args()
-        .nth(1)
-        .unwrap_or_else(|| "World".to_string());
+    // Default Temporal dev-server frontend endpoint.
+    let endpoint =
+        std::env::var("TEMPORAL_ADDRESS").unwrap_or_else(|_| "http://localhost:7233".to_string());
 
-    // Connect to the Temporal server via helper.
-    let client = get_client().await?;
+    info!("Connecting to Temporal Frontend at {endpoint} …");
 
-    info!("Starting 'greet' workflow for name={name}");
+    // Build an async tonic channel.
+    let channel = Channel::from_shared(endpoint.clone())?.connect().await?;
 
-    // Start workflow execution on task queue `hello-world`.
-    // Build payload vec
-    let payload = json!(name).as_json_payload()?;
-    let input = vec![payload];
+    // Construct the gRPC stub client.
+    let mut client = WorkflowServiceClient::new(channel);
 
-    let workflow_id = format!("hello-{}", Uuid::new_v4());
-
-    // Start the workflow execution and capture the server response which includes the `run_id`.
-    let start_res = client
-        .start_workflow(
-            input,
-            "hello-world".to_string(),
-            workflow_id.clone(),
-            "greet".to_string(),
-            None,
-            WorkflowOptions::default(),
-        )
+    // Perform the ListNamespaces RPC.
+    let resp = client
+        .list_namespaces(ListNamespacesRequest {
+            page_size: 1000,
+            ..Default::default()
+        })
         .await?;
 
-    // Create a handle so we can easily fetch results.
-    let handle = client.get_untyped_workflow_handle(workflow_id, start_res.run_id.clone());
-
-    // Await workflow completion and extract the single string payload.
-    let res_payloads: Vec<Payload> = handle
-        .get_workflow_result(Default::default())
-        .await?
-        .unwrap_success();
-
-    // Convert first payload to String.
-    let greeting_payload = res_payloads
-        .first()
-        .ok_or_else(|| anyhow::anyhow!("missing result payload"))?;
-
-    let greeting: String = String::from_json_payload(greeting_payload)?;
-
-    println!("Workflow completed with result: {greeting}");
+    println!("Namespaces returned by ListNamespaces:");
+    for ns in resp.into_inner().namespaces {
+        let info = ns.namespace_info.expect("namespace_info");
+        println!("- {} (state: {:?})", info.name, info.state());
+    }
 
     Ok(())
 }

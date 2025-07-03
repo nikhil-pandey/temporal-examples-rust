@@ -16,6 +16,8 @@ Shows a parent workflow spawning multiple child workflows concurrently and colle
    ```
    cargo run --bin client
    ```
-4. The parent workflow will spawn, await, and collect results from two child workflows.
+4. The parent workflow will spawn two *child workflows* (`child_workflow`), wait
+   for both to complete, and then return their results (a `Vec<String>` with
+   each child's output). The client prints this combined vector on stdout.
 
 Learn more from the [main workspace README](../../README.md).

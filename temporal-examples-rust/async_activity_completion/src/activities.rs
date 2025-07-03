@@ -32,12 +32,11 @@ pub async fn do_something_async(
         tokio::time::sleep(Duration::from_secs(5)).await;
 
         // Acquire the token and complete the activity.
-        if let Some(token) = token_ref.lock().await.take() {
-            if let Err(err) = complete_activity(token).await {
-                // Log the error – in production you might retry or send to
-                // Sentry etc.
-                log::error!("failed to complete activity: {err}");
-            }
+        if let Some(token) = token_ref.lock().await.take()
+            && let Err(err) = complete_activity(token).await
+        {
+            // Log the error – in production you might retry or send to Sentry, etc.
+            log::error!("failed to complete activity: {err}");
         }
     });
 

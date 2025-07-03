@@ -4,7 +4,7 @@ use log::info;
 use std::time::Duration;
 use temporal_sdk::{WfContext, WfExitValue, WorkflowResult};
 use temporal_sdk_core_protos::coresdk::{
-    workflow_commands::ContinueAsNewWorkflowExecution, AsJsonPayloadExt, FromJsonPayloadExt,
+    AsJsonPayloadExt, FromJsonPayloadExt, workflow_commands::ContinueAsNewWorkflowExecution,
 };
 
 /// Workflow that loops up to 10 times via Continue-As-New.

@@ -57,6 +57,9 @@ serde_json = "1.0.140"
 uuid = { version = "1.7.0", features = ["v4"] }
 reqwest = { version = "0.12.22", features = ["json"] }
 
+# tonic gRPC client (used by grpc_calls example)
+tonic = { version = "0.12.3", features = ["transport"] }
+
 # Add common proto helper for RetryPolicy durations
 prost-wkt-types = "0.6.1"
 

@@ -1,24 +1,26 @@
-//! Worker binary for the `signals_unblock` example.
+//! Worker for the `custom_logger` example.
 
 use std::sync::Arc;
 
-use env_logger::Env;
+use custom_logger::logger;
+use custom_logger::{activities::log_activity, workflow::logging_workflow};
 use helpers::get_client;
 use log::info;
 use temporal_sdk::Worker;
 use temporal_sdk_core::{CoreRuntime, init_worker};
-use temporal_sdk_core_api::worker::WorkerVersioningStrategy;
-use temporal_sdk_core_api::{telemetry::TelemetryOptionsBuilder, worker::WorkerConfigBuilder};
+use temporal_sdk_core_api::{
+    telemetry::TelemetryOptionsBuilder,
+    worker::{WorkerConfigBuilder, WorkerVersioningStrategy},
+};
 
-use signals_unblock::workflow::signal_await_workflow;
-
-const TASK_QUEUE: &str = "signals-unblock";
+const TASK_QUEUE: &str = "custom-logger";
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-    env_logger::Builder::from_env(Env::default().default_filter_or("info")).init();
+    // Install custom logger (stdout + worker.log)
+    logger::init();
 
-    info!("Starting signals_unblock worker …");
+    info!(target: "custom_logger", "Starting custom_logger worker …");
 
     let client = get_client().await?;
 
@@ -36,8 +38,9 @@ async fn main() -> anyhow::Result<()> {
     let core_worker = init_worker(&runtime, worker_config, client)?;
     let mut worker = Worker::new_from_core(Arc::new(core_worker), TASK_QUEUE);
 
-    // Register workflow implementation.
-    worker.register_wf("signal_await_workflow", signal_await_workflow);
+    // Register activity & workflow.
+    worker.register_activity("log_activity", log_activity);
+    worker.register_wf("logging_workflow", logging_workflow);
 
     worker.run().await?;
 

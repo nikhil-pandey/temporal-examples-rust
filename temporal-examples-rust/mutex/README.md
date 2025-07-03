@@ -8,17 +8,28 @@ This sample demonstrates an async mutex/lock coordinated by a Temporal workflow.
    ```
    temporal server start-dev
    ```
-2. In this crate directory, start the worker:
-   ```
+2. In **one** terminal, start the worker (keeps polling):
+   ```bash
    cargo run --bin worker
    ```
-3. In two other terminals, run the client (with a lock id argument, e.g. `my-lock-id`):
-   ```
-   cargo run --bin client my-lock-id
-   ```
-   Run the above command in two different terminals at the same time. The second will not finish until the first releases the lock (after about 5 seconds).
 
-4. Observe logs and output for lock serialization.
+3. In **another** terminal, launch the lock coordinator for a lock id (defaults to `mutex-lock`). **Run this once**:
+   ```bash
+   cargo run --bin lock_starter           # or: cargo run --bin lock_starter my-lock-id
+   ```
+
+4. Finally, open **two additional terminals** and run the client twice:
+   ```bash
+   # terminal A
+   cargo run --bin client                 # uses default lock id
+
+   # terminal B (start a moment later)
+   cargo run --bin client                 # second contender for the same lock
+   ```
+
+   The first client will acquire the lock immediately, hold it for ~5 seconds, then release. The second client waits until the lock is released before proceeding – demonstrating serialized access.
+
+5. Observe the worker logs – you should **not** see the previous “Requesting lock” spam. Instead, each workflow requests once, then the coordinator grants and waits for release.
 
 ## Details
 

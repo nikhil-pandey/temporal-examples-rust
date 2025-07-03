@@ -9,7 +9,7 @@
 use log::debug;
 use serde::de::DeserializeOwned;
 use temporal_sdk_core_protos::coresdk::activity_result::{
-    activity_resolution::Status::Completed, ActivityResolution,
+    ActivityResolution, activity_resolution::Status::Completed,
 };
 
 /// Attempt to extract and deserialize the successful result value of an

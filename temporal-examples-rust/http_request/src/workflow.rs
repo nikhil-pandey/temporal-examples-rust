@@ -5,7 +5,7 @@ use log::{info, warn};
 use std::time::Duration;
 use temporal_sdk::{ActivityOptions, WfContext, WfExitValue, WorkflowResult};
 use temporal_sdk_core_protos::coresdk::{
-    workflow_commands::ActivityCancellationType, AsJsonPayloadExt,
+    AsJsonPayloadExt, workflow_commands::ActivityCancellationType,
 };
 
 /// Workflow that calls the `make_http_request` activity and returns the echoed

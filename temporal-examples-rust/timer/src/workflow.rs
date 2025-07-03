@@ -6,7 +6,7 @@ use log::{debug, info};
 use std::time::Duration;
 use temporal_sdk::{ActivityOptions, WfContext, WfExitValue, WorkflowResult};
 use temporal_sdk_core_protos::coresdk::{
-    workflow_commands::ActivityCancellationType, AsJsonPayloadExt, FromJsonPayloadExt,
+    AsJsonPayloadExt, FromJsonPayloadExt, workflow_commands::ActivityCancellationType,
 };
 
 const ORDER_PROCESSING_ACTIVITY: &str = "order_processing_activity";

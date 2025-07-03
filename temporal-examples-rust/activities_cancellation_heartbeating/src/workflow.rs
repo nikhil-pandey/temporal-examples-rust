@@ -7,7 +7,7 @@ use std::time::Duration;
 use temporal_sdk::{ActivityOptions, WfContext, WfExitValue, WorkflowResult};
 use temporal_sdk_core::protos::temporal::api::common::v1::RetryPolicy;
 use temporal_sdk_core_protos::coresdk::{
-    workflow_commands::ActivityCancellationType, AsJsonPayloadExt,
+    AsJsonPayloadExt, workflow_commands::ActivityCancellationType,
 };
 
 use crate::activities::FakeProgressInput;

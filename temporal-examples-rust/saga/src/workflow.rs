@@ -1,11 +1,31 @@
 //! Workflow that books a trip via N activities, running compensations when any step fails.
 
+//! Saga workflow – sequential bookings with compensation on failure.
+
+// Implementation note:
+// The previous version of this workflow returned `WfExitValue::Evicted` when
+// any booking activity failed. Doing so causes a **panic inside the SDK**
+// (`Don't explicitly return this`), because `Evicted` is a special internal
+// value the core SDK uses for eviction handling – user code must **never**
+// return it.
+// Instead, workflows should either **fail** (`Err(..)`) or complete
+// **successfully** (`Ok(WfExitValue::Normal(..))`). This patch rewrites the
+// failure handling logic so that:
+//
+// 1. All failed booking attempts trigger *compensation* of previously completed
+//    steps.
+// 2. If compensation succeeds the workflow *completes* with
+//    `WfExitValue::Normal("compensated".into())`.
+// 3. If compensation itself fails, the workflow *fails* by returning an
+//    `Err` – this is surfaced to the SDK / visibility APIs without panicking.
+
+use anyhow::anyhow;
 use helpers::parse_activity_result;
 use log::{info, warn};
 use std::time::Duration;
 use temporal_sdk::{ActivityOptions, WfContext, WfExitValue, WorkflowResult};
 use temporal_sdk_core_protos::coresdk::{
-    workflow_commands::ActivityCancellationType, AsJsonPayloadExt,
+    AsJsonPayloadExt, workflow_commands::ActivityCancellationType,
 };
 
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
@@ -39,7 +59,8 @@ pub async fn book_trip_workflow(ctx: WfContext) -> WorkflowResult<String> {
         }
         Err(e) => {
             warn!("Failed to reserve flight: {e}");
-            return Ok(WfExitValue::Evicted);
+            // No reservation succeeded, so nothing to compensate.
+            return Err(anyhow!("reserve_flight failed: {e}"));
         }
     };
     // Step 2: reserve hotel
@@ -72,7 +93,8 @@ pub async fn book_trip_workflow(ctx: WfContext) -> WorkflowResult<String> {
                     .await;
                 info!("Compensating {name}: id={id} -> {result:?}");
             }
-            return Ok(WfExitValue::Evicted);
+            // All compensations ran – treat workflow as compensated success.
+            return Ok(WfExitValue::Normal("compensated".into()));
         }
     };
     // Step 3: reserve car
@@ -105,7 +127,7 @@ pub async fn book_trip_workflow(ctx: WfContext) -> WorkflowResult<String> {
                     .await;
                 info!("Compensating {name}: id={id} -> {result:?}");
             }
-            return Ok(WfExitValue::Evicted);
+            return Ok(WfExitValue::Normal("compensated".into()));
         }
     };
     // All succeeded

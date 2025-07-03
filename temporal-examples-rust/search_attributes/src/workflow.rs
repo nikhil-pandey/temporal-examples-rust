@@ -18,12 +18,19 @@ pub async fn set_search_attribute(ctx: WfContext) -> WorkflowResult<()> {
         None => "unknown-customer".to_string(),
     };
 
-    info!("search_attributes: workflow set search attribute CustomerId={customer_id}");
+    // NOTE: The Temporal dev-server ships with 8 pre-defined *dynamic* search attribute
+    // keys named `CustomStringField`, `CustomIntField`, … etc.  Using one of those
+    // avoids the “Namespace has no mapping defined” error you’d get when you attempt
+    // to upsert a brand-new custom attribute such as `CustomerId` without first
+    // registering it via `tctl admin cluster search-attribute add`.  For the sake of
+    // this example we therefore use `CustomStringField`.
+
+    info!("search_attributes: upserting CustomStringField={customer_id} (instead of custom key)");
 
     // Upsert search attribute with Temporal. The API expects a Map<String, Payload>.
     let payload = customer_id.as_json_payload()?;
     let mut search_attrs = std::collections::HashMap::new();
-    search_attrs.insert("CustomerId".to_string(), payload);
+    search_attrs.insert("CustomStringField".to_string(), payload);
 
     ctx.upsert_search_attributes(search_attrs);
 

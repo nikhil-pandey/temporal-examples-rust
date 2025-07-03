@@ -48,9 +48,9 @@ pub async fn parent_workflow(ctx: WfContext) -> WorkflowResult<Vec<String>> {
 
     // Each ChildWorkflowResult deserializes automatically? Actually result() returns ChildWorkflowResult which contains payloads etc.
     // Use helpers: The ChildWorkflowResult implements FromJsonPayload maybe but easiest: use AsJsonPayloadExt on vector of Payload.
-    use temporal_sdk_core_protos::coresdk::child_workflow::child_workflow_result::Status;
-    use temporal_sdk_core_protos::coresdk::child_workflow::ChildWorkflowResult;
     use temporal_sdk_core_protos::coresdk::FromJsonPayloadExt;
+    use temporal_sdk_core_protos::coresdk::child_workflow::ChildWorkflowResult;
+    use temporal_sdk_core_protos::coresdk::child_workflow::child_workflow_result::Status;
 
     fn extract(r: ChildWorkflowResult) -> anyhow::Result<String> {
         match r.status.ok_or_else(|| anyhow::anyhow!("missing status"))? {

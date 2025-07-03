@@ -4,7 +4,7 @@ use helpers::get_client;
 use log::info;
 use std::sync::Arc;
 use temporal_sdk::Worker;
-use temporal_sdk_core::{init_worker, CoreRuntime};
+use temporal_sdk_core::{CoreRuntime, init_worker};
 use temporal_sdk_core_api::{
     telemetry::TelemetryOptionsBuilder,
     worker::{
