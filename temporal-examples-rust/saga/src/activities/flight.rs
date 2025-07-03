@@ -15,7 +15,7 @@ pub async fn reserve_flight(
 ) -> Result<String, ActivityError> {
     // 50/50 random failure using new rand API.
     let mut rng = rand::rngs::ThreadRng::default();
-    let should_fail: bool = rng.gen_bool(0.5);
+    let should_fail: bool = rng.gen_bool(0.1);
     let id = Uuid::new_v4().to_string();
     info!("Trying to reserve flight, simulated id={id}, will_fail={should_fail}");
     if should_fail {
