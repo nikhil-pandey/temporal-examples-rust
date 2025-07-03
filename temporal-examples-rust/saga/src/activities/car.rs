@@ -14,8 +14,8 @@ pub async fn reserve_car(
     _payload: Option<String>,
 ) -> Result<String, ActivityError> {
     // Generate a boolean that is `true` ~50 % of the time.
-    let mut rng = rand::rngs::ThreadRng::default();
-    let should_fail: bool = rng.gen_bool(0.5);
+    let mut rng = rand::rng();
+    let should_fail: bool = rng.random_bool(0.5);
     let id = Uuid::new_v4().to_string();
     info!("Trying to reserve car, simulated id={id}, will_fail={should_fail}");
     if should_fail {

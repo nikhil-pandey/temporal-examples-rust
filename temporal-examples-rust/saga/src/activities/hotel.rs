@@ -13,8 +13,8 @@ pub async fn reserve_hotel(
     _ctx: ActContext,
     _payload: Option<String>,
 ) -> Result<String, ActivityError> {
-    let mut rng = rand::rngs::ThreadRng::default();
-    let should_fail: bool = rng.gen_bool(0.7);
+    let mut rng = rand::rng();
+    let should_fail: bool = rng.random_bool(0.7);
     let id = Uuid::new_v4().to_string();
     info!("Trying to reserve hotel, simulated id={id}, will_fail={should_fail}");
     if should_fail {
