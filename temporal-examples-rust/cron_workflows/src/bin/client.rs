@@ -23,7 +23,7 @@ async fn main() -> anyhow::Result<()> {
     let input = vec![json!(0_u64).as_json_payload()?];
 
     let options = WorkflowOptions {
-        cron_schedule: Some("*/5 * * * * *".into()), // every 5 seconds
+        cron_schedule: Some("* * * * *".into()), // every minute
         ..Default::default()
     };
 
@@ -42,6 +42,6 @@ async fn main() -> anyhow::Result<()> {
         "Started cron workflow with id={workflow_id}, run_id={}",
         start_res.run_id
     );
-    println!("It will run every 5 seconds until terminated.");
+    println!("It will run every minute until terminated.");
     Ok(())
 }
